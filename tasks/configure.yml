@@ -1,0 +1,10 @@
+---
+
+- name: create exporter configuration file
+  template:
+    src: exporter-cfg.j2
+    dest: "{{ consul_exporter_dirs.config_dir }}/{{ consul_exporter_config_file }}"
+    owner: root
+    group: "{{ consul_exporter_user_name }}"
+    mode: 0640
+  notify: service restart

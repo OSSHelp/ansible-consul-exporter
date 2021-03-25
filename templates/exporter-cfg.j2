@@ -1,0 +1,1 @@
+CONSUL_EXPORTER_PARAMS="{% for group in consul_exporter_params.items()|sort %}{% for key, value in group[1].items()|sort %}--{{ group[0] }}.{{ key }}={{ value }} {% endfor %}{% endfor %}"

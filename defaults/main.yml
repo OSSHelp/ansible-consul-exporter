@@ -1,0 +1,16 @@
+---
+consul_exporter_setup: full
+
+consul_exporter_version: "0.7.1"
+consul_exporter_binary_url: https://github.com/prometheus/consul_exporter/releases/download/v{{ consul_exporter_version }}/consul_exporter-{{ consul_exporter_version }}.linux-amd64.tar.gz
+
+consul_exporter_config_file: consul_exporter.cfg
+consul_exporter_binary_name: consul_exporter
+consul_exporter_user_name: consul_exporter
+consul_exporter_service_name: consul_exporter
+consul_exporter_systemd_unit: "/etc/systemd/system/{{ consul_exporter_service_name }}.service"
+consul_exporter_dirs:
+  binary_dir: /usr/local/bin
+  config_dir: /usr/local/etc/consul_exporter
+
+consul_exporter_params: {}

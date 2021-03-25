@@ -1,0 +1,60 @@
+---
+
+- name: create user
+  user:
+    name: "{{ consul_exporter_user_name }}"
+    home: "/nonexistent"
+    create_home: no
+    shell: "/bin/false"
+    system: yes
+
+- name: check if binary file exists
+  stat:
+    path: "{{ consul_exporter_dirs.binary_dir }}/{{ consul_exporter_binary_name }}"
+  register: binary_file
+
+- name: download and place binary
+  block:
+    - name: download and unarchive binary
+      unarchive:
+        src: "{{ consul_exporter_binary_url }}"
+        dest: /tmp
+        remote_src: yes
+    - name: copy binary
+      copy:
+        src: "/tmp/consul_exporter-{{ consul_exporter_version }}.linux-amd64/consul_exporter"
+        dest: "{{ consul_exporter_dirs.binary_dir }}/{{ consul_exporter_binary_name }}"
+        owner: root
+        group: root
+        mode: 0755
+        remote_src: yes
+  when: not binary_file.stat.exists
+
+- name: create systemd unit
+  template:
+    src: systemd-unit.j2
+    dest: "{{ consul_exporter_systemd_unit }}"
+  notify:
+    - systemd reload
+    - service restart
+
+- name: ensure that configuration directory exists
+  file:
+    path: "{{ consul_exporter_dirs.config_dir }}"
+    state: directory
+
+- name: create exporter configuration file
+  template:
+    src: exporter-cfg.j2
+    dest: "{{ consul_exporter_dirs.config_dir }}/{{ consul_exporter_config_file }}"
+    owner: root
+    group: "{{ consul_exporter_user_name }}"
+    mode: 0640
+  notify: service restart
+
+- meta: flush_handlers
+
+- name: enable service
+  systemd:
+    name: "{{ consul_exporter_service_name }}"
+    enabled: true

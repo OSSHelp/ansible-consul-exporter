@@ -1,0 +1,25 @@
+[Unit]
+Description=consul exporter
+
+[Service]
+Type=forking
+User={{ consul_exporter_user_name }}
+Group={{ consul_exporter_user_name }}
+RuntimeDirectory=consul_exporter
+RuntimeDirectoryMode=0755
+EnvironmentFile={{ consul_exporter_dirs.config_dir }}/{{ consul_exporter_config_file }}
+{% if ansible_distribution_release == 'focal' %}
+PIDFile=/run/consul_exporter/pid
+{% else %}
+PIDFile=/var/run/consul_exporter/pid
+{% endif %}
+ExecStart=/sbin/start-stop-daemon -Sbmp /var/run/consul_exporter/pid -x {{ consul_exporter_dirs.binary_dir }}/consul_exporter -- $CONSUL_EXPORTER_PARAMS
+
+Restart=always
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=consul_exporter
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+---
+
+- name: systemd reload
+  systemd:
+    daemon_reload: true
+
+- name: service restart
+  systemd:
+    name: "{{ consul_exporter_service_name }}"
+    state: restarted
