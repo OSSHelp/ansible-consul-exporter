@@ -8,3 +8,4 @@
     group: "{{ consul_exporter_user_name }}"
     mode: 0640
   notify: service restart
+  when: not ansible_check_mode

@@ -28,7 +28,7 @@
         group: root
         mode: 0755
         remote_src: yes
-  when: not binary_file.stat.exists
+  when: not binary_file.stat.exists and not ansible_check_mode
 
 - name: create systemd unit
   template:
@@ -42,6 +42,7 @@
   file:
     path: "{{ consul_exporter_dirs.config_dir }}"
     state: directory
+  when: not ansible_check_mode
 
 - name: create exporter configuration file
   template:
@@ -51,6 +52,7 @@
     group: "{{ consul_exporter_user_name }}"
     mode: 0640
   notify: service restart
+  when: not ansible_check_mode
 
 - meta: flush_handlers
 
